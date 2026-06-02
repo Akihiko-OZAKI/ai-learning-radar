@@ -1,22 +1,11 @@
 {
   "name": "ai-observatory-web",
   "version": "1.0.0",
-  "description": "",
   "scripts": {
     "dev": "next dev --turbopack -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.4.0",
-      "onFail": "download"
-    }
   },
   "dependencies": {
     "better-sqlite3": "^12.10.0",
@@ -35,10 +24,5 @@
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "better-sqlite3",
-      "sharp"
-    ]
-  }
+  "packageManager": "pnpm@11.5.1"
 }
