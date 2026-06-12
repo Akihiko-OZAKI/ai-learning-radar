@@ -57,3 +57,21 @@ export interface StatusResponse {
   total_terms: number;
   permanent_terms: number;
 }
+
+export interface VolatilityIndex {
+  date: string;
+  score: number;
+  label: string;
+  components: {
+    surge_rate: number;
+    rank_change_rate: number;
+    new_term_rate: number;
+    volume_change: number;
+  };
+  weights: {
+    surge_rate: number;
+    rank_change_rate: number;
+    new_term_rate: number;
+    volume_change: number;
+  };
+}

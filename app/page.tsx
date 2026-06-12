@@ -3,12 +3,14 @@ import type {
   ThemeRankingItem,
   NewTermItem,
   StatusResponse,
+  VolatilityIndex,
 } from "@/types";
 import { getThemeKeyFromName } from "@/lib/theme-colors";
 import ThemeBadge from "@/components/ThemeBadge";
 import RankChange from "@/components/RankChange";
 import RiseReason from "@/components/RiseReason";
 import ThemeRankingCard from "@/components/ThemeRankingCard";
+import VolatilityGauge from "@/components/VolatilityGauge";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
 
@@ -25,12 +27,13 @@ async function fetchData<T>(path: string): Promise<T | null> {
 }
 
 export default async function HomePage() {
-  const [status, popular, rising, themes, newTerms] = await Promise.all([
+  const [status, popular, rising, themes, newTerms, volatility] = await Promise.all([
     fetchData<StatusResponse>("/api/status"),
     fetchData<{ date: string; items: RankingItem[] }>("/api/ranking/popular?limit=20"),
     fetchData<{ date: string; items: RankingItem[] }>("/api/ranking/rising?limit=20"),
     fetchData<{ date: string; items: ThemeRankingItem[] }>("/api/ranking/themes"),
     fetchData<{ items: NewTermItem[] }>("/api/ranking/new?days=30&limit=10"),
+    fetchData<VolatilityIndex>("/api/volatility"),
   ]);
 
   const popularItems = popular?.items ?? [];
@@ -63,6 +66,19 @@ export default async function HomePage() {
           データソース: GitHub / Hacker News
         </span>
       </div>
+
+      {/* AI変動指数 */}
+      <section style={{ marginBottom: "20px" }}>
+        <div className="card">
+          <div className="card-header">
+            ⚡ AI変動指数
+            <span style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 400 }}>
+              AI業界の変化速度（0〜100）
+            </span>
+          </div>
+          <VolatilityGauge data={volatility} />
+        </div>
+      </section>
 
       {/* AIテーマランキング */}
       <section style={{ marginBottom: "20px" }}>
