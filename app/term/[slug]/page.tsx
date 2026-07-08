@@ -12,6 +12,7 @@ import ThemeBadge from "@/components/ThemeBadge";
 import RankChange from "@/components/RankChange";
 import RiseReason from "@/components/RiseReason";
 import ScoreChart from "@/components/ScoreChart";
+import HotNewsList from "@/components/HotNewsList";
 import { notFound } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
@@ -246,50 +247,7 @@ export default async function TermPage({
               Hacker News 過去90日
             </span>
           </div>
-          <div style={{ padding: "8px 0" }}>
-            {news.map((item, i) => (
-              <a
-                key={i}
-                href={`https://news.ycombinator.com/item?id=${item.hn_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: "12px",
-                  padding: "10px 16px",
-                  borderBottom: i < news.length - 1 ? "1px solid var(--border)" : "none",
-                  textDecoration: "none",
-                  transition: "background 0.15s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--bg-secondary)")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: "14px",
-                      color: "var(--text-primary)",
-                      fontWeight: 500,
-                      lineHeight: 1.4,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {item.title}
-                  </div>
-                  <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "3px" }}>
-                    {item.collected_at}
-                  </div>
-                </div>
-                <div style={{ display: "flex", gap: "10px", flexShrink: 0, fontSize: "12px" }}>
-                  <span style={{ color: "var(--accent-orange)" }}>▲ {item.score}</span>
-                  <span style={{ color: "var(--text-muted)" }}>💬 {item.comments}</span>
-                </div>
-              </a>
-            ))}
-          </div>
+          <HotNewsList items={news} />
         </div>
       )}
     </div>
