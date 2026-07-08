@@ -32,7 +32,7 @@ async function fetchTerm(slug: string): Promise<TermDetail | null> {
 async function fetchNews(slug: string, days: number): Promise<HotNewsItem[]> {
   try {
     const res = await fetch(
-      `${API_BASE}/api/term/${encodeURIComponent(slug)}/news?days=${days}&limit=10`,
+      `${API_BASE}/api/term/${encodeURIComponent(slug)}/news?days=${days}&limit=15`,
       { next: { revalidate: 300 } }
     );
     if (!res.ok) return [];
@@ -71,7 +71,7 @@ export default async function TermPage({
   const [term, history30, news] = await Promise.all([
     fetchTerm(termName),
     fetchHistory(termName, 30),
-    fetchNews(termName, 30),
+    fetchNews(termName, 90),
   ]);
 
   if (!term) notFound();
@@ -243,7 +243,7 @@ export default async function TermPage({
           <div className="card-header">
             🔥 Hot News
             <span style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 400 }}>
-              Hacker News 過去30日
+              Hacker News 過去90日
             </span>
           </div>
           <div style={{ padding: "8px 0" }}>
