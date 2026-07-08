@@ -1,4 +1,12 @@
 import type { TermDetail, ScoreHistory } from "@/types";
+
+interface HotNewsItem {
+  title: string;
+  score: number;
+  comments: number;
+  collected_at: string;
+  hn_id: number;
+}
 import { getThemeColor, getThemeKeyFromName } from "@/lib/theme-colors";
 import ThemeBadge from "@/components/ThemeBadge";
 import RankChange from "@/components/RankChange";
@@ -18,6 +26,20 @@ async function fetchTerm(slug: string): Promise<TermDetail | null> {
     return res.json();
   } catch {
     return null;
+  }
+}
+
+async function fetchNews(slug: string, days: number): Promise<HotNewsItem[]> {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/term/${encodeURIComponent(slug)}/news?days=${days}&limit=10`,
+      { next: { revalidate: 300 } }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.items ?? [];
+  } catch {
+    return [];
   }
 }
 
@@ -46,9 +68,10 @@ export default async function TermPage({
   const { slug } = await params;
   const termName = decodeURIComponent(slug);
 
-  const [term, history30] = await Promise.all([
+  const [term, history30, news] = await Promise.all([
     fetchTerm(termName),
     fetchHistory(termName, 30),
+    fetchNews(termName, 30),
   ]);
 
   if (!term) notFound();
@@ -213,6 +236,62 @@ export default async function TermPage({
           </table>
         </div>
       </div>
+
+      {/* Hot News */}
+      {news.length > 0 && (
+        <div className="card" style={{ marginTop: "20px" }}>
+          <div className="card-header">
+            🔥 Hot News
+            <span style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 400 }}>
+              Hacker News 過去30日
+            </span>
+          </div>
+          <div style={{ padding: "8px 0" }}>
+            {news.map((item, i) => (
+              <a
+                key={i}
+                href={`https://news.ycombinator.com/item?id=${item.hn_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "12px",
+                  padding: "10px 16px",
+                  borderBottom: i < news.length - 1 ? "1px solid var(--border)" : "none",
+                  textDecoration: "none",
+                  transition: "background 0.15s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--bg-secondary)")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: "14px",
+                      color: "var(--text-primary)",
+                      fontWeight: 500,
+                      lineHeight: 1.4,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {item.title}
+                  </div>
+                  <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "3px" }}>
+                    {item.collected_at}
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: "10px", flexShrink: 0, fontSize: "12px" }}>
+                  <span style={{ color: "var(--accent-orange)" }}>▲ {item.score}</span>
+                  <span style={{ color: "var(--text-muted)" }}>💬 {item.comments}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
