@@ -155,7 +155,7 @@ export default async function HomePage() {
                       />
                     </td>
                     <td style={{ textAlign: "right", fontFamily: "monospace" }}>
-                      {item.total_score.toLocaleString()}
+                      {Math.round(item.total_score).toLocaleString()}
                     </td>
                     <td style={{ textAlign: "right" }}>
                       <RankChange change={item.rank_change} />

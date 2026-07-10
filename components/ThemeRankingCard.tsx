@@ -86,7 +86,7 @@ export default function ThemeRankingCard({ items }: Props) {
                   color: "var(--text-primary)",
                 }}
               >
-                {item.total_score.toLocaleString()}
+                {Math.round(item.total_score).toLocaleString()}
               </div>
             </div>
           </div>
