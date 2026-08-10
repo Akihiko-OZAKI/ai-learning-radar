@@ -24,6 +24,7 @@ export interface NewTermItem {
   category: string | null;
   first_seen: string;
   total_score: number | null;
+  description: string | null;
 }
 
 export interface TermDetail {

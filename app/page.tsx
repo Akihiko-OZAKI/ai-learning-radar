@@ -11,6 +11,7 @@ import RankChange from "@/components/RankChange";
 import RiseReason from "@/components/RiseReason";
 import ThemeRankingCard from "@/components/ThemeRankingCard";
 import VolatilityGauge from "@/components/VolatilityGauge";
+import TermTooltip from "@/components/TermTooltip";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
 
@@ -255,12 +256,11 @@ export default async function HomePage() {
                 {newItems.map((item) => (
                   <tr key={item.term_name}>
                     <td>
-                      <a
+                      <TermTooltip
+                        termName={item.term_name}
+                        description={item.description ?? null}
                         href={`/term/${encodeURIComponent(item.term_name)}`}
-                        style={{ color: "var(--text-primary)", fontWeight: 500 }}
-                      >
-                        {item.term_name}
-                      </a>
+                      />
                       <span
                         style={{
                           marginLeft: "6px",
