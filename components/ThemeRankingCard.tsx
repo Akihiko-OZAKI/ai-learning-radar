@@ -45,6 +45,7 @@ export default function ThemeRankingCard({ items }: Props) {
               }}
             />
             <div style={{ position: "relative" }}>
+              {/* ヘッダー行: ランク + 用語数 */}
               <div
                 style={{
                   display: "flex",
@@ -68,6 +69,8 @@ export default function ThemeRankingCard({ items }: Props) {
                   {item.term_count}用語
                 </span>
               </div>
+
+              {/* テーマ名 */}
               <div
                 style={{
                   fontWeight: 700,
@@ -78,16 +81,48 @@ export default function ThemeRankingCard({ items }: Props) {
               >
                 {item.theme_name}
               </div>
+
+              {/* 合計スコア */}
               <div
                 style={{
                   fontFamily: "monospace",
                   fontSize: "18px",
                   fontWeight: 700,
                   color: "var(--text-primary)",
+                  marginBottom: "6px",
                 }}
               >
                 {Math.round(item.total_score).toLocaleString()}
               </div>
+
+              {/* トップ用語 */}
+              {item.top_term && (
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "var(--text-secondary)",
+                    marginBottom: "4px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  🏆 {item.top_term}
+                </div>
+              )}
+
+              {/* 急上昇数 */}
+              {item.rising_count != null && item.rising_count > 0 && (
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "var(--accent-orange)",
+                    fontWeight: 600,
+                  }}
+                >
+                  ▲ {item.rising_count}件 急上昇中
+                </div>
+              )}
             </div>
           </div>
         );

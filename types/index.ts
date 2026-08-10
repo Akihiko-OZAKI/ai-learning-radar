@@ -13,6 +13,9 @@ export interface ThemeRankingItem {
   theme_name: string;
   total_score: number;
   term_count: number;
+  avg_score: number | null;
+  rising_count: number | null;
+  top_term: string | null;
 }
 
 export interface NewTermItem {
