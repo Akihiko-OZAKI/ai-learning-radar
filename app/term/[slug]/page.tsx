@@ -44,6 +44,31 @@ async function fetchNews(slug: string, days: number): Promise<HotNewsItem[]> {
   }
 }
 
+interface RelatedTerm {
+  term_name: string;
+  total_score: number;
+  rank: number | null;
+}
+
+interface RelatedResponse {
+  term_name: string;
+  theme_name: string | null;
+  items: RelatedTerm[];
+}
+
+async function fetchRelated(slug: string): Promise<RelatedResponse | null> {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/term/${encodeURIComponent(slug)}/related?limit=5`,
+      { next: { revalidate: 300 } }
+    );
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
 async function fetchHistory(
   slug: string,
   days: number
@@ -69,10 +94,11 @@ export default async function TermPage({
   const { slug } = await params;
   const termName = decodeURIComponent(slug);
 
-  const [term, history30, news] = await Promise.all([
+  const [term, history30, news, related] = await Promise.all([
     fetchTerm(termName),
     fetchHistory(termName, 30),
     fetchNews(termName, 90),
+    fetchRelated(termName),
   ]);
 
   if (!term) notFound();
@@ -248,6 +274,65 @@ export default async function TermPage({
             </span>
           </div>
           <HotNewsList items={news} />
+        </div>
+      )}
+
+      {/* 関連用語（同テーマ） */}
+      {related && related.items.length > 0 && (
+        <div className="card" style={{ marginTop: "20px" }}>
+          <div className="card-header">
+            🔗 同テーマの注目用語
+            <span style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 400 }}>
+              {related.theme_name}
+            </span>
+          </div>
+          <div style={{ padding: "8px 0" }}>
+            {related.items.map((item, i) => (
+              <a
+                key={item.term_name}
+                href={`/term/${encodeURIComponent(item.term_name)}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  padding: "8px 16px",
+                  borderBottom: i < related.items.length - 1 ? "1px solid var(--border)" : "none",
+                  textDecoration: "none",
+                }}
+                className="hot-news-item"
+              >
+                <span
+                  style={{
+                    fontSize: "11px",
+                    color: "var(--text-muted)",
+                    minWidth: "20px",
+                    fontFamily: "monospace",
+                  }}
+                >
+                  #{item.rank ?? "-"}
+                </span>
+                <span
+                  style={{
+                    flex: 1,
+                    fontSize: "14px",
+                    color: "var(--text-primary)",
+                    fontWeight: 500,
+                  }}
+                >
+                  {item.term_name}
+                </span>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontFamily: "monospace",
+                    color: "var(--text-muted)",
+                  }}
+                >
+                  {item.total_score.toLocaleString()}
+                </span>
+              </a>
+            ))}
+          </div>
         </div>
       )}
     </div>

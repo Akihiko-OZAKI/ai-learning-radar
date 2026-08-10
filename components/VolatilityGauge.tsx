@@ -6,11 +6,11 @@ interface Props {
   data: VolatilityIndex | null;
 }
 
-const LABEL_COLORS: Record<string, { bg: string; color: string; border: string }> = {
-  "安定":             { bg: "rgba(63,185,80,0.12)",  color: "#3fb950", border: "rgba(63,185,80,0.4)" },
-  "活発":             { bg: "rgba(88,166,255,0.12)", color: "#58a6ff", border: "rgba(88,166,255,0.4)" },
-  "急変":             { bg: "rgba(240,136,62,0.12)", color: "#f0883e", border: "rgba(240,136,62,0.4)" },
-  "パラダイムシフト": { bg: "rgba(248,81,73,0.12)",  color: "#f85149", border: "rgba(248,81,73,0.4)" },
+const LABEL_STYLES: Record<string, { color: string; glow: string; gradient: string }> = {
+  "安定":             { color: "#3fb950", glow: "rgba(63,185,80,0.4)",   gradient: "linear-gradient(90deg, #3fb950 0%, #58a6ff 100%)" },
+  "活発":             { color: "#58a6ff", glow: "rgba(88,166,255,0.4)",  gradient: "linear-gradient(90deg, #3fb950 0%, #58a6ff 60%, #f0883e 100%)" },
+  "急変":             { color: "#f0883e", glow: "rgba(240,136,62,0.4)",  gradient: "linear-gradient(90deg, #3fb950 0%, #58a6ff 40%, #f0883e 80%, #f85149 100%)" },
+  "パラダイムシフト": { color: "#f85149", glow: "rgba(248,81,73,0.5)",   gradient: "linear-gradient(90deg, #3fb950 0%, #58a6ff 33%, #f0883e 66%, #f85149 100%)" },
 };
 
 const COMPONENT_LABELS: Record<string, string> = {
@@ -18,6 +18,13 @@ const COMPONENT_LABELS: Record<string, string> = {
   rank_change_rate: "ランキング入替率",
   new_term_rate:    "新規用語出現率",
   volume_change:    "総言及量変化",
+};
+
+const COMPONENT_ICONS: Record<string, string> = {
+  surge_rate:       "🚀",
+  rank_change_rate: "🔄",
+  new_term_rate:    "✨",
+  volume_change:    "📊",
 };
 
 export default function VolatilityGauge({ data }: Props) {
@@ -30,82 +37,131 @@ export default function VolatilityGauge({ data }: Props) {
   }
 
   const { score, label, components, weights } = data;
-  const style = LABEL_COLORS[label] ?? LABEL_COLORS["安定"];
-
-  // ゲージバーの幅（0〜100%）
-  const barWidth = `${Math.min(score, 100)}%`;
+  const style = LABEL_STYLES[label] ?? LABEL_STYLES["安定"];
+  const barPercent = Math.min(score, 100);
 
   return (
     <div style={{ padding: "16px" }}>
-      {/* スコア表示 */}
-      <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "14px" }}>
-        {/* 数値 */}
-        <div
-          style={{
-            fontSize: "56px",
-            fontWeight: 700,
-            fontFamily: "monospace",
-            color: style.color,
-            lineHeight: 1,
-            minWidth: "80px",
-          }}
-        >
-          {score.toFixed(1)}
-        </div>
-        {/* ラベルと説明 */}
-        <div>
+      {/* スコア + ラベル */}
+      <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "16px" }}>
+        {/* 大きなスコア数値 */}
+        <div style={{ position: "relative" }}>
           <div
             style={{
-              display: "inline-block",
-              padding: "4px 12px",
-              borderRadius: "20px",
-              backgroundColor: style.bg,
-              color: style.color,
-              border: `1px solid ${style.border}`,
+              fontSize: "64px",
               fontWeight: 700,
-              fontSize: "14px",
-              marginBottom: "4px",
+              fontFamily: "monospace",
+              color: style.color,
+              lineHeight: 1,
+              textShadow: `0 0 20px ${style.glow}`,
+              letterSpacing: "-2px",
             }}
           >
+            {Math.round(score)}
+          </div>
+          <div style={{ fontSize: "11px", color: "var(--text-muted)", textAlign: "center", marginTop: "2px" }}>
+            / 100
+          </div>
+        </div>
+
+        {/* ラベルと説明 */}
+        <div style={{ flex: 1 }}>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "6px 14px",
+              borderRadius: "20px",
+              backgroundColor: `${style.color}22`,
+              color: style.color,
+              border: `1px solid ${style.color}66`,
+              fontWeight: 700,
+              fontSize: "16px",
+              marginBottom: "8px",
+              boxShadow: `0 0 12px ${style.glow}`,
+            }}
+          >
+            {label === "安定" && "🟢"}
+            {label === "活発" && "🔵"}
+            {label === "急変" && "🟠"}
+            {label === "パラダイムシフト" && "🔴"}
             {label}
           </div>
-          <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
-            0〜20: 安定 / 20〜50: 活発 / 50〜80: 急変 / 80〜100: パラダイムシフト
+          <div style={{ fontSize: "11px", color: "var(--text-muted)", lineHeight: 1.6 }}>
+            AI技術トレンドの変化速度を示す指数
           </div>
         </div>
       </div>
 
-      {/* ゲージバー */}
-      <div
-        style={{
-          height: "8px",
-          backgroundColor: "var(--bg-secondary)",
-          borderRadius: "4px",
-          overflow: "hidden",
-          marginBottom: "16px",
-          border: "1px solid var(--border)",
-        }}
-      >
+      {/* グラデーションゲージバー */}
+      <div style={{ marginBottom: "6px" }}>
         <div
           style={{
-            height: "100%",
-            width: barWidth,
-            backgroundColor: style.color,
-            borderRadius: "4px",
-            transition: "width 0.5s ease",
+            height: "12px",
+            backgroundColor: "var(--bg-secondary)",
+            borderRadius: "6px",
+            overflow: "hidden",
+            border: "1px solid var(--border)",
+            position: "relative",
           }}
-        />
+        >
+          {/* グラデーションバー */}
+          <div
+            style={{
+              height: "100%",
+              width: `${barPercent}%`,
+              background: style.gradient,
+              borderRadius: "6px",
+              transition: "width 0.6s ease",
+              boxShadow: `0 0 8px ${style.glow}`,
+            }}
+          />
+          {/* 目盛り線（20/50/80） */}
+          {[20, 50, 80].map((mark) => (
+            <div
+              key={mark}
+              style={{
+                position: "absolute",
+                left: `${mark}%`,
+                top: 0,
+                height: "100%",
+                width: "1px",
+                backgroundColor: "var(--border)",
+                opacity: 0.6,
+              }}
+            />
+          ))}
+        </div>
+        {/* 目盛りラベル */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            fontSize: "10px",
+            color: "var(--text-muted)",
+            marginTop: "3px",
+            padding: "0 2px",
+          }}
+        >
+          <span>0</span>
+          <span style={{ marginLeft: "calc(20% - 8px)" }}>安定</span>
+          <span style={{ marginLeft: "calc(30% - 8px)" }}>活発</span>
+          <span style={{ marginLeft: "calc(30% - 8px)" }}>急変</span>
+          <span>100</span>
+        </div>
       </div>
 
       {/* 成分内訳 */}
-      <div style={{ fontSize: "12px" }}>
-        <div style={{ color: "var(--text-muted)", marginBottom: "6px", fontWeight: 600 }}>
+      <div style={{ marginTop: "14px" }}>
+        <div style={{ color: "var(--text-muted)", fontSize: "11px", fontWeight: 600, marginBottom: "8px" }}>
           指数の内訳
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
           {Object.entries(components).map(([key, value]) => {
             const weight = weights[key as keyof typeof weights];
             const contribution = value * weight * 100;
+            const barW = Math.min(value * 100, 100);
             return (
               <div
                 key={key}
@@ -116,29 +172,45 @@ export default function VolatilityGauge({ data }: Props) {
                   border: "1px solid var(--border)",
                 }}
               >
-                <div style={{ color: "var(--text-muted)", fontSize: "11px", marginBottom: "2px" }}>
-                  {COMPONENT_LABELS[key]} ({Math.round(weight * 100)}%)
+                <div style={{ display: "flex", alignItems: "center", gap: "4px", marginBottom: "4px" }}>
+                  <span style={{ fontSize: "12px" }}>{COMPONENT_ICONS[key]}</span>
+                  <span style={{ color: "var(--text-muted)", fontSize: "11px" }}>
+                    {COMPONENT_LABELS[key]}
+                  </span>
+                  <span style={{ color: "var(--text-muted)", fontSize: "10px", marginLeft: "auto" }}>
+                    ×{Math.round(weight * 100)}%
+                  </span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <div
                     style={{
                       flex: 1,
-                      height: "4px",
+                      height: "5px",
                       backgroundColor: "var(--border)",
-                      borderRadius: "2px",
+                      borderRadius: "3px",
                       overflow: "hidden",
                     }}
                   >
                     <div
                       style={{
                         height: "100%",
-                        width: `${Math.min(value * 100, 100)}%`,
-                        backgroundColor: style.color,
-                        opacity: 0.7,
+                        width: `${barW}%`,
+                        background: style.gradient,
+                        opacity: 0.85,
+                        transition: "width 0.5s ease",
                       }}
                     />
                   </div>
-                  <span style={{ fontFamily: "monospace", color: "var(--text-secondary)", minWidth: "32px" }}>
+                  <span
+                    style={{
+                      fontFamily: "monospace",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      color: contribution > 5 ? style.color : "var(--text-secondary)",
+                      minWidth: "28px",
+                      textAlign: "right",
+                    }}
+                  >
                     {contribution.toFixed(1)}
                   </span>
                 </div>
