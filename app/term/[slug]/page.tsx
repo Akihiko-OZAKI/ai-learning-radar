@@ -7,6 +7,7 @@ interface HotNewsItem {
   collected_at: string;
   hn_id: number;
 }
+import type { Metadata } from "next";
 import { getThemeColor, getThemeKeyFromName } from "@/lib/theme-colors";
 import ThemeBadge from "@/components/ThemeBadge";
 import RankChange from "@/components/RankChange";
@@ -14,6 +15,32 @@ import RiseReason from "@/components/RiseReason";
 import ScoreChart from "@/components/ScoreChart";
 import HotNewsList from "@/components/HotNewsList";
 import { notFound } from "next/navigation";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const termName = decodeURIComponent(slug);
+  const term = await fetchTerm(termName);
+  if (!term) {
+    return { title: "AI変化観測所" };
+  }
+  const themeLabel = term.theme_name ? ` | ${term.theme_name}` : "";
+  return {
+    title: `${term.term_name}${themeLabel} | AI変化観測所`,
+    description: term.description
+      ? term.description.slice(0, 160)
+      : `${term.term_name}のAI技術トレンド情報。スコア推移、Hot News、関連用語を確認。`,
+    openGraph: {
+      title: `${term.term_name} | AI変化観測所`,
+      description: term.description ?? `${term.term_name}のAI技術トレンド情報`,
+      url: `https://www.ai-learning-radar.jp/term/${encodeURIComponent(term.term_name)}`,
+      siteName: "AI変化観測所",
+    },
+  };
+}
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
 

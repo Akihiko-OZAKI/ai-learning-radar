@@ -33,7 +33,7 @@ export default async function HomePage() {
     fetchData<{ date: string; items: RankingItem[] }>("/api/ranking/popular?limit=20"),
     fetchData<{ date: string; items: RankingItem[] }>("/api/ranking/rising?limit=20"),
     fetchData<{ date: string; items: ThemeRankingItem[] }>("/api/ranking/themes"),
-    fetchData<{ items: NewTermItem[] }>("/api/ranking/new?days=30&limit=10"),
+    fetchData<{ items: NewTermItem[] }>("/api/ranking/new?days=14&limit=15"),
     fetchData<VolatilityIndex>("/api/volatility"),
   ]);
 
@@ -236,7 +236,7 @@ export default async function HomePage() {
           <div className="card-header">
             ✨ 新規発見
             <span style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: 400 }}>
-              過去30日以内に初登場した用語
+              過去14日以内に初登場した用語
             </span>
           </div>
           {newItems.length === 0 ? (

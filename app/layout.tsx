@@ -2,9 +2,21 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AI変化観測所",
+  title: {
+    default: "AI変化観測所 | AI技術トレンドランキング",
+    template: "%s | AI変化観測所",
+  },
   description:
-    "世界のAI開発コミュニティを観測し、今どこにエネルギーが流れているかを可視化する。",
+    "GitHub・Hacker NewsからリアルタイムにAI技術用語を自動収集・スコアリング。LLM・AIエージェント・RAGなどAI技術の最新トレンドを発見できる観測サイト。",
+  keywords: ["AI", "LLM", "AIエージェント", "RAG", "MCP", "AIトレンド", "機械学習", "深層学習", "ChatGPT", "Claude", "Gemini"],
+  openGraph: {
+    title: "AI変化観測所",
+    description: "GitHub・Hacker NewsからリアルタイムにAI技術用語を自動収集・スコアリング。",
+    url: "https://www.ai-learning-radar.jp",
+    siteName: "AI変化観測所",
+    locale: "ja_JP",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
